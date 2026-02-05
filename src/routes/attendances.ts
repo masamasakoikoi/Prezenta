@@ -11,20 +11,20 @@ const attendances = await prisma.attendance.findMany({
   }
 })
 
-const user = await prisma.user.create({
-  data: {
-    email: "test@test.com",
-    password: "123456",
-  }
-})
+// const user = await prisma.user.create({
+//   data: {
+//     email: "test@test.com",
+//     password: "123456",
+//   }
+// })
 
-const attendance = await prisma.attendance.create({
-  data: {
-    date: "2026-02-02",
-    status: "working",
-    userId: user.id,
-  }
-})
+// const attendance = await prisma.attendance.create({
+//   data: {
+//     date: "2026-02-02",
+//     status: "working",
+//     userId: user.id,
+//   }
+// })
 
  // 一覧取得
  router.get("/",(req,res) => {
@@ -76,16 +76,6 @@ router.get("/", (_req,res) => {
   res.json(attendances);
 });
 
-
-router.post("/users", async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await prisma.user.create({
-    data: { email, password },
-  });
-
-  res.json(user);
-})
 
 router.post("/attendaces", async (req, res) => {
   const {userId, date } = req.body;
