@@ -31,6 +31,26 @@ const attendances = await prisma.attendance.findMany({
   res.json(attendances);
  })
 
+ router.post("/", async (req, res) => {
+  const {userId, date } = req.body;
+
+  const attendace = await prisma.attendance.create({
+    data: {
+      userId,
+      date,
+      status:"working"
+    },
+  });
+
+  res.json(attendace);
+});
+
+// await prisma.attendance.findMany({
+//   include: {
+//     user: true,
+//   },
+// });
+
 // 出勤
 router.post("/start", (req,res) => {
   const { userId, date } = req.body;
@@ -74,27 +94,6 @@ router.post("/finish", (req,res) => {
 // 一覧取得
 router.get("/", (_req,res) => {
   res.json(attendances);
-});
-
-
-router.post("/attendaces", async (req, res) => {
-  const {userId, date } = req.body;
-
-  const attendace = await prisma.attendance.create({
-    data: {
-      userId,
-      date,
-      status:"working"
-    },
-  });
-
-  res.json(attendace);
-});
-
-const data = await prisma.attendance.findMany({
-  include: {
-    user: true,
-  },
 });
 
 export default router;

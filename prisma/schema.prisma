@@ -14,6 +14,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id    Int     @id @default(autoincrement())
+  email String @unique
+  name String?
+  password String
+
+  attendances Attendance[]
+}
+
 model Attendance {
   id        Int      @id @default(autoincrement())
   userId    Int
@@ -23,14 +32,4 @@ model Attendance {
   status    String
   startTime String?
   endTime   String?
-}
-
-
-model User {
-  id    Int     @id @default(autoincrement())
-  email String @unique
-  name String?
-  password String
-
-  attendances Attendance[]
 }

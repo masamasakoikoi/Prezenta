@@ -1,6 +1,7 @@
 import express from "express";
 import attendanceRouter from "./routes/attendances";
 import usersRouter from "./routes/users"
+import authRouter from "./routes/auth"
 
 const app = express();
 app.use(express.json());
@@ -13,4 +14,6 @@ app.listen(3000, () => {
 
 app.use(express.json());
 
-app.use("/users", usersRouter)
+app.use("/users", usersRouter);
+
+app.use("/auth", authRouter);
