@@ -1,6 +1,6 @@
 import { Router } from "express";
-import type { Attendance } from "../types/attendance";
 import { prisma } from "../lib/prisma";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 
@@ -11,67 +11,39 @@ const attendances = await prisma.attendance.findMany({
   }
 })
 
-// const user = await prisma.user.create({
-//   data: {
-//     email: "test@test.com",
-//     password: "123456",
-//   }
-// })
-
-// const attendance = await prisma.attendance.create({
-//   data: {
-//     date: "2026-02-02",
-//     status: "working",
-//     userId: user.id,
-//   }
-// })
-
  // 一覧取得
  router.get("/",(req,res) => {
   res.json(attendances);
  })
 
- router.post("/", async (req, res) => {
-  const {userId, date } = req.body;
+ // 出勤登録
+ router.post("/", authMiddleware, async (req, res) => {
+  try {
+    const userId = (req as any).userId;
 
-  const attendace = await prisma.attendance.create({
-    data: {
-      userId,
-      date,
-      status:"working"
-    },
-  });
+    const { date, status }= req.body;
 
-  res.json(attendace);
-});
+    if (!date || !status) {
+      return res.status(400).json({ error: "dateとstatusは必須です"});
+    }
 
-// await prisma.attendance.findMany({
-//   include: {
-//     user: true,
-//   },
-// });
+    const attendance = await prisma.attendance.create({
+      data: {
+        userId,
+        date,
+        status,
+      },
+      include: {
+        user: true,
+      }
+    });
 
-// 出勤
-router.post("/start", (req,res) => {
-  const { userId, date } = req.body;
-
-  const existing = attendances.find(
-    a => a.userId === userId && a.date === date
-  );
-
-  if(existing && existing.status !== "not_started") {
-    return res.status(400).json({ message:"既に出勤済みです" });
+    res.status(201).json(attendance);
+  
+  } catch (error) {
+    console.error("勤怠登録エラー：", error);
+    res.status(500).json({ error: "勤怠登録に失敗しました。" });
   }
-
-  const attendance: Attendance = {
-    userId,
-    date,
-    status: "working",
-    startTime: new Date().toISOString(),
-  };
-
-  attendances.push(attendance);
-  res.json(attendance);
 });
 
 // 退勤
@@ -95,6 +67,7 @@ router.post("/finish", (req,res) => {
 router.get("/", (_req,res) => {
   res.json(attendances);
 });
+
 
 export default router;
 
