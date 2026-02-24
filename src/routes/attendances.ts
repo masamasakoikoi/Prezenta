@@ -17,7 +17,7 @@ const attendances = await prisma.attendance.findMany({
  })
 
  // 出勤登録
- router.post("/", authMiddleware, async (req, res) => {
+ router.post("/start", authMiddleware, async (req, res) => {
   try {
     const userId = (req as any).userId;
 
@@ -32,13 +32,14 @@ const attendances = await prisma.attendance.findMany({
         userId,
         date,
         status,
+        startTime: new Date().toISOString(),
       },
-      include: {
-        user: true,
-      }
+      // include: {
+      //   user: true,
+      // }
     });
 
-    res.status(201).json(attendance);
+    res.json(attendance);
   
   } catch (error) {
     console.error("勤怠登録エラー：", error);
@@ -58,7 +59,7 @@ router.post("/finish", (req,res) => {
     return res.status(400).json({ message: "退勤できません"});
   }
   attendance.status = "finished";
-  attendance.finishTime_ = new Date().toISOString();
+  attendance.finishTime = new Date().toISOString();
 
   res.json(attendance);
 });

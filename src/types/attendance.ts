@@ -8,5 +8,5 @@ export type Attendance = {
   date: string;
   status: AttendanceStatus;
   startTime?: string;
-  finishTime_?: string;
+  finishTime?: string;
 };

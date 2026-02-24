@@ -31,5 +31,7 @@ model Attendance {
   date      String
   status    String
   startTime String?
-  endTime   String?
+  finishTime   String?
+
+  @@unique([userId, date])
 }
