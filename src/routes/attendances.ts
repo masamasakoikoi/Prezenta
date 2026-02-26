@@ -4,72 +4,95 @@ import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// 仮のDB（メモリ）
-const attendances = await prisma.attendance.findMany({
-  include: {
-    user: true,
-  }
-})
+router.use(authMiddleware);
 
- // 一覧取得
- router.get("/",(req,res) => {
-  res.json(attendances);
- })
+// 出勤登録
+router.post("/start", async (req, res) => {
+    const userId = req.userId;
+    const { date }= req.body;
 
- // 出勤登録
- router.post("/start", authMiddleware, async (req, res) => {
-  try {
-    const userId = (req as any).userId;
+    if(!userId) return res.status(401).json({ message: "認証が必要です"});
+    if(!date) return res.status(400).json({ message: "dateは必須です"});
 
-    const { date, status }= req.body;
+    try {
+      const existing = await prisma.attendance.findFirst({
+        where: { userId, date },
+      });
 
-    if (!date || !status) {
-      return res.status(400).json({ error: "dateとstatusは必須です"});
+      if( existing && existing.status === "working") {
+        return res.status(400).json({ message: "すでに出勤済みです"});
+      }
+      if( existing && existing.status === "finished") {
+        return res.status(400).json({ message: "本日はすでに退勤済みです"});
+      }
+
+      const attendance = await prisma.attendance.create({
+        data: {
+          userId,
+          date,
+          status: "working",
+          startTime: new Date().toISOString(),
+        },
+      });
+
+      return res.json(attendance);
+
+    } catch (e: any) {
+      return res.status(500).json({ message: "DBエラー" });
     }
-
-    const attendance = await prisma.attendance.create({
-      data: {
-        userId,
-        date,
-        status,
-        startTime: new Date().toISOString(),
-      },
-      // include: {
-      //   user: true,
-      // }
-    });
-
-    res.json(attendance);
-  
-  } catch (error) {
-    console.error("勤怠登録エラー：", error);
-    res.status(500).json({ error: "勤怠登録に失敗しました。" });
-  }
 });
 
 // 退勤
-router.post("/finish", (req,res) => {
-  const { userId, date } = req.body;
+router.post("/finish", async (req, res) => {
+  const userId = req.userId;
+  const { date }= req.body;
 
-  const attendance = attendances.find(
-    a => a.userId === userId && a.date === date
-  );
+  if(!userId) return res.status(401).json({ message: "認証が必要です"});
+  if(!date) return res.status(400).json({ message: "dateは必須です"});
+
+  const attendance = await prisma.attendance.findFirst({
+    where: { userId, date },
+    orderBy: { id: "desc" },
+  });
 
   if (!attendance || attendance.status !== "working") {
     return res.status(400).json({ message: "退勤できません"});
   }
-  attendance.status = "finished";
-  attendance.finishTime = new Date().toISOString();
 
-  res.json(attendance);
+  const updated = await prisma.attendance.update({
+    where: { id: attendance.id },
+    date: {
+      status: "finished",
+      finishTime: new Date().toISOString(),
+    },
+  });
+
+  return res.json(updated);
 });
 
 // 一覧取得
-router.get("/", (_req,res) => {
-  res.json(attendances);
-});
+router.get("/", async (req,res) => {
+  const userId = req.userId;
+  if (!userId) return res.status(401).json({ message: "認証が必要です" });
+
+  const list = await prisma.attendance.findMany({
+    where: { userId },
+    orderBy: [{ date:"desc" }, {id: "desc"}],
+  });
+  
+  return res.json(list);
+ });
+
+ export default router;
+
+// // 仮のDB（メモリ）
+// const attendances = await prisma.attendance.findMany({
+//   include: {
+//     user: true,
+//   }
+// })
 
 
-export default router;
+
 
 
