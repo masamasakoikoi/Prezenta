@@ -9,7 +9,7 @@ router.use(authMiddleware);
 // 出勤登録
 router.post("/start", async (req, res) => {
     const userId = req.userId;
-    const { date }= req.body;
+    const { date } = (req.body ?? {}) as { date?: string };
 
     if(!userId) return res.status(401).json({ message: "認証が必要です"});
     if(!date) return res.status(400).json({ message: "dateは必須です"});
