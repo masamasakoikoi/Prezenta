@@ -12,10 +12,15 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(express.json());
+// app.use(cors({
+//   origin: "http://localhost:5173",
+//   credentials: true
+// }));
 app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
+  origin: "http://localhost:3000",  // Next.js の URL
+  credentials: true,               // Cookie を通す（JWT認証に必要）
 }));
+
 app.use(express.static(path.join(__dirname, "../../")));
 
 app.get("/", (req, res) => {
@@ -26,8 +31,8 @@ app.use("/attendances", attendanceRouter);
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 
-app.listen(3000, () => {
-  console.log("Server started on http://localhost:3000");
+app.listen(4000, () => {
+  console.log("Server started on http://localhost:4000");
 })
 
 app.use((err: any, _req: any, res: any, _next: any) => {
