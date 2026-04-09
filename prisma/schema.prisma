@@ -32,6 +32,9 @@ model Attendance {
   status    String
   startTime String?
   finishTime   String?
+  checkIn    String?   // 追加
+  checkOut   String?   // 追加
+  comment    String  @default("")  // 追加
 
   @@unique([userId, date])
 }
