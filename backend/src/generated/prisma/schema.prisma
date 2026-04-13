@@ -15,27 +15,27 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String @unique
-  name String?
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
   password String
 
   attendances Attendance[]
 }
 
 model Attendance {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
-  date      String
-  status    String
-  startTime String?
-  finishTime   String?
-  checkIn        String?   // 追加
-  checkOut       String?   // 追加
-  comment        String  @default("")  // 追加
-  approvalStatus String?   // null | "pending" | "approved" | "cancelled"
+  date           String
+  status         String
+  startTime      String?
+  finishTime     String?
+  checkIn        String? // 追加
+  checkOut       String? // 追加
+  comment        String  @default("") // 追加
+  approvalStatus String? // null | "pending" | "approved" | "cancelled"
 
   @@unique([userId, date])
 }

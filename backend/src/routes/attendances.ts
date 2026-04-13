@@ -130,23 +130,83 @@ router.put("/:date", async (req, res) => {
   if (!userId) return res.status(401).json({ message: "認証が必要です" });
 
   const { date } = req.params;
-  const { checkIn, checkOut, comment } = req.body as {
-    checkIn:  string | null;
-    checkOut: string | null;
+  const { startTime, finishTime, comment } = req.body as {
+    startTime:  string | null;
+    finishTime: string | null;
     comment:  string;
   };
 
   const timePattern = /^\d{2}:\d{2}$/;
-  if (checkIn  && !timePattern.test(checkIn))  return res.status(400).json({ message: "checkIn の形式が不正 (HH:MM)" });
-  if (checkOut && !timePattern.test(checkOut)) return res.status(400).json({ message: "checkOut の形式が不正 (HH:MM)" });
+  if (startTime  && !timePattern.test(startTime))  return res.status(400).json({ message: "startTime の形式が不正 (HH:MM)" });
+  if (finishTime && !timePattern.test(finishTime)) return res.status(400).json({ message: "finishTime の形式が不正 (HH:MM)" });
 
   try {
+     // 申請中・承認済みは編集不可
+    const existing = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date } },
+    });
+    if (existing && (existing.approvalStatus === "pending" || existing.approvalStatus === "approved")) {
+      return res.status(403).json({ message: "申請中または承認済みのため編集できません" });
+    }
     await prisma.attendance.upsert({
       where: { userId_date: { userId, date } },
-      update: { checkIn: checkIn ?? null, checkOut: checkOut ?? null, comment: comment ?? "" },
-      create: { userId, date, checkIn: checkIn ?? null, checkOut: checkOut ?? null, comment: comment ?? "" },
+      update: { startTime: startTime ?? null, finishTime: finishTime ?? null, comment: comment ?? "", status: "edited", approvalStatus: null },
+      create: { userId, date, startTime: startTime ?? null, finishTime: finishTime ?? null, comment: comment ?? "", status: "edited", approvalStatus: null },
     });
     return res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "サーバーエラー" });
+  }
+});
+
+// 申請
+router.post("/:date/apply", async (req, res) => {
+  const userId = req.userId;
+  if (!userId) return res.status(401).json({ message: "認証が必要です" });
+
+  const { date } = req.params;
+
+  try {
+    const attendance = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date } },
+    });
+
+    if (!attendance) return res.status(404).json({ message: "勤怠が見つかりません" });
+    if (attendance.approvalStatus === "pending")  return res.status(400).json({ message: "既に申請中です" });
+    if (attendance.approvalStatus === "approved") return res.status(400).json({ message: "既に承認済みです" });
+
+    const updated = await prisma.attendance.update({
+      where: { id: attendance.id },
+      data: { approvalStatus: "pending" },
+    });
+    return res.json(updated);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "サーバーエラー" });
+  }
+});
+
+// 申請取消
+router.post("/:date/cancel-application", async (req, res) => {
+  const userId = req.userId;
+  if (!userId) return res.status(401).json({ message: "認証が必要です" });
+
+  const { date } = req.params;
+
+  try {
+    const attendance = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date } },
+    });
+
+    if (!attendance) return res.status(404).json({ message: "勤怠が見つかりません" });
+    if (attendance.approvalStatus === "approved") return res.status(400).json({ message: "承認済みのため取り消しできません" });
+
+    const updated = await prisma.attendance.update({
+      where: { id: attendance.id },
+      data: { approvalStatus: "cancelled" },
+    });
+    return res.json(updated);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "サーバーエラー" });

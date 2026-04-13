@@ -13,13 +13,13 @@ export function parseDate(dateStr: string) {
 
 /** "09:00", "18:30" → { display: "08:15", totalMinutes: 495 }（休憩1h差し引き） */
 export function calcWorkTime(
-  checkIn: string | null,
-  checkOut: string | null
+  startTime: string | null,
+  finishTime: string | null
 ): { display: string; totalMinutes: number } | null {
-  if (!checkIn || !checkOut) return null;
-  const [ih, im] = checkIn.split(":").map(Number);
-  const [oh, om] = checkOut.split(":").map(Number);
-  const total = oh * 60 + om - (ih * 60 + im) - 60; // 休憩60分
+  if (!startTime || !finishTime) return null;
+  const [ih, im] = startTime.split(":").map(Number);
+  const [oh, om] = finishTime.split(":").map(Number);
+  const total = oh * 60 + om - (ih * 60 + im); // 休憩60分
   if (total <= 0) return null;
   const h = Math.floor(total / 60);
   const m = total % 60;
@@ -40,4 +40,13 @@ export function getDaysInMonth(year: number, month: number): string[] {
 
 export function formatMonthLabel(year: number, month: number) {
   return `${year}年${month}月`;
+}
+
+/** "2026-04-11T13:46:01.906Z" → "13:46" */
+export function formatTimeFromISO(isoString: string | null): string | null {
+  if (!isoString) return null;
+  // すでに "HH:MM" 形式の場合はそのまま返す
+  if (/^\d{2}:\d{2}$/.test(isoString)) return isoString;
+  const d = new Date(isoString);
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }

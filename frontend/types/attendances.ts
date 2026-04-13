@@ -2,10 +2,12 @@
 export interface AttendanceRecord {
   id: number;
   date: string;        // "2025-03-05" (YYYY-MM-DD)
-  checkIn: string | null;   // "09:00"
-  checkOut: string | null;  // "18:30"
+  startTime: string | null;   // "09:00"
+  finishTime: string | null;  // "18:30"
   comment: string;
   userId: number;
+  status?: string;     // "working" | "finished" | "edited"
+  approvalStatus?: string | null; // null | "pending" | "approved" | "cancelled"
   createdAt?: string;
   updatedAt?: string;
 }
@@ -19,7 +21,7 @@ export interface AttendanceMonthResponse {
 
 // PUT /api/attendance/:date のリクエストボディ
 export interface UpdateAttendancePayload {
-  checkIn: string | null;
-  checkOut: string | null;
+  startTime: string | null;
+  finishTime: string | null;
   comment: string;
 }

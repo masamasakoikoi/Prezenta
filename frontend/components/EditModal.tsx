@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import type { AttendanceRecord, UpdateAttendancePayload } from "@/types/attendance";
+import type { AttendanceRecord, UpdateAttendancePayload } from "@/types/attendances";
 import { parseDate } from "@/lib/dateUtils";
 
 interface Props {
@@ -11,8 +11,13 @@ interface Props {
 }
 
 export default function EditModal({ record, onClose, onSave }: Props) {
-  const [checkIn, setCheckIn]   = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  // const [startTime, setstartTime]   = useState("");
+  // const [finishTime, setfinishTime] = useState("");
+  const [startH, setStartH] = useState("");
+  const [startM, setStartM] = useState("");
+  const [finishH, setFinishH] = useState("");
+  const [finishM, setFinishM] = useState("");
+  const [isNextDay, setIsNextDay] = useState(false);
   const [comment, setComment]   = useState("");
   const [saving, setSaving]     = useState(false);
   const [error, setError]       = useState<string | null>(null);
@@ -20,11 +25,14 @@ export default function EditModal({ record, onClose, onSave }: Props) {
 
   useEffect(() => {
     if (record) {
-      setCheckIn(record.checkIn ?? "");
-      setCheckOut(record.checkOut ?? "");
-      setComment(record.comment ?? "");
+      const [sh, sm] = (record.startTime ?? "").split(":");
+      const [fh, fm] = (record.finishTime ?? "").split(":");
+      setStartH(sh ?? "");
+      setStartM(sm ?? "");
+      setFinishH(fh ?? "");
+      setFinishM(fm ?? "");
+      setIsNextDay(false);
       setError(null);
-      // モーダルが開いたら最初の入力にフォーカス
       setTimeout(() => firstInputRef.current?.focus(), 50);
     }
   }, [record]);
@@ -44,12 +52,26 @@ export default function EditModal({ record, onClose, onSave }: Props) {
 
   async function handleSave() {
     if (!record) return;
+  
+    const startTime  = startH && startM   ? `${startH}:${startM}`   : null;
+    const finishTime = finishH && finishM ? `${finishH}:${finishM}` : null;
+  
+    // 両方入力されている場合のみ時刻チェック
+    if (startTime && finishTime && !isNextDay) {
+      const [sh, sm] = startTime.split(":").map(Number);
+      const [fh, fm] = finishTime.split(":").map(Number);
+      if (fh * 60 + fm <= sh * 60 + sm) {
+        setError("退勤時間は出勤時間より後の時刻を入力してください");
+        return;
+      }
+    }
+  
     setSaving(true);
     setError(null);
     try {
       await onSave(record.date, {
-        checkIn: checkIn || null,
-        checkOut: checkOut || null,
+        startTime,
+        finishTime,
         comment,
       });
       onClose();
@@ -58,6 +80,52 @@ export default function EditModal({ record, onClose, onSave }: Props) {
     } finally {
       setSaving(false);
     }
+  }
+
+  function TimeSelect({
+    value,
+    onChange,
+    options,
+    nextDay,
+    onNextDayChange,
+  }: {
+    value: string;
+    onChange: (v: string) => void;
+    options: string[];
+    nextDay?: boolean;
+    onNextDayChange?: (v: boolean) => void;
+  }) {
+    return (
+      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+        {nextDay !== undefined && (
+          <span
+            onClick={() => onNextDayChange?.(!nextDay)}
+            style={{
+              position: "absolute", top: -24, left: 0,
+              fontSize: "0.75rem", color: nextDay ? "#4f7ef8" : "#666666",
+              cursor: "pointer", whiteSpace: "nowrap", userSelect: "none",
+            }}
+          >退勤</span>
+        )}
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            border: "1px solid #e0e0e0", borderRadius: 8,
+            padding: "0.45rem 0.5rem", fontSize: "0.9rem",
+            color: "#111", background: "#fff",
+            outline: "none", cursor: "pointer",
+            appearance: "none", textAlign: "center",
+            width: 58,
+          }}
+        >
+          <option value="">--</option>
+          {options.map((o) => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+      </div>
+    );
   }
 
   return (
@@ -88,41 +156,40 @@ export default function EditModal({ record, onClose, onSave }: Props) {
         </div>
 
         {/* フォーム */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {(["checkIn", "checkOut"] as const).map((field) => (
-            <label key={field} style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-              <span style={{ fontSize: "0.75rem", fontWeight: 500, color: "#666" }}>
-                {field === "checkIn" ? "出勤時間" : "退勤時間"}
-              </span>
-              <input
-                ref={field === "checkIn" ? firstInputRef : undefined}
-                type="time"
-                value={field === "checkIn" ? checkIn : checkOut}
-                onChange={(e) => field === "checkIn" ? setCheckIn(e.target.value) : setCheckOut(e.target.value)}
-                style={{
-                  border: "1px solid #e0e0e0", borderRadius: 8,
-                  padding: "0.5rem 0.75rem", fontSize: "0.9rem",
-                  color: "#111", outline: "none", width: "100%",
-                }}
-              />
-            </label>
-          ))}
-
-          <label style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            <span style={{ fontSize: "0.75rem", fontWeight: 500, color: "#666" }}>コメント</span>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="備考・メモなど"
-              rows={3}
-              style={{
-                border: "1px solid #e0e0e0", borderRadius: 8,
-                padding: "0.5rem 0.75rem", fontSize: "0.9rem",
-                color: "#111", outline: "none", resize: "vertical",
-                fontFamily: "inherit", width: "100%",
-              }}
+        {/* 出退勤 */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 500, color: "#666" }}>出勤</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {/* 出勤 時 */}
+            <TimeSelect
+              value={startH}
+              onChange={setStartH}
+              options={Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"))}
             />
-          </label>
+            <span style={{ color: "#888" }}>:</span>
+            {/* 出勤 分 */}
+            <TimeSelect
+              value={startM}
+              onChange={setStartM}
+              options={Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"))}
+            />
+            <span style={{ color: "#aaa", margin: "0 4px" }}>〜</span>
+            {/* 退勤 時（翌日含む） */}
+            <TimeSelect
+              value={finishH}
+              onChange={setFinishH}
+              options={Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"))}
+              nextDay={isNextDay}
+              onNextDayChange={setIsNextDay}
+            />
+            <span style={{ color: "#888" }}>:</span>
+            {/* 退勤 分 */}
+            <TimeSelect
+              value={finishM}
+              onChange={setFinishM}
+              options={Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"))}
+            />
+          </div>
         </div>
 
         {/* エラー */}

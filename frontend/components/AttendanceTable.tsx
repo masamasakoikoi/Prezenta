@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { AttendanceRecord, AttendanceMonthResponse, UpdateAttendancePayload } from "@/types/attendances";
-import { fetchAttendance, updateAttendance } from "@/lib/attendanceApi";
-import { parseDate, calcWorkTime, getDaysInMonth, formatMonthLabel } from "@/lib/dateUtils";
+import { fetchAttendance, updateAttendance, applyAttendance, cancelAttendance } from "@/lib/attendanceApi";
+import { parseDate, calcWorkTime, getDaysInMonth, formatMonthLabel, formatTimeFromISO } from "@/lib/dateUtils";
 import EditModal from "./EditModal";
 
 export default function AttendanceTable() {
@@ -22,10 +22,9 @@ export default function AttendanceTable() {
     setLoading(true);
     setError(null);
     try {
-      const res: AttendanceMonthResponse = await fetchAttendance(year, month);
+      const res = await fetchAttendance(year, month);
       const map = new Map<string, AttendanceRecord>();
       for (const r of res.records) {
-        // Prismaが返すdateは "2025-03-05T00:00:00.000Z" の場合もあるので先頭10文字に正規化
         const dateKey = r.date.slice(0, 10);
         map.set(dateKey, { ...r, date: dateKey });
       }
@@ -58,12 +57,44 @@ export default function AttendanceTable() {
       next.set(date, {
         ...(existing ?? { id: 0, userId: 0, comment: "" }),
         date,
-        checkIn: payload.checkIn,
-        checkOut: payload.checkOut,
+        startTime: payload.startTime,
+        finishTime: payload.finishTime,
         comment: payload.comment,
+        status: "edited",
+        approvalStatus: null,
       });
       return next;
     });
+  }
+
+  // ── 申請 ───────────────────────────────────────────────
+  async function handleApply(date: string) {
+    try {
+      const updated = await applyAttendance(date);
+      setRecordMap((prev) => {
+        const next = new Map(prev);
+        const existing = next.get(date);
+        next.set(date, { ...(existing ?? updated), approvalStatus: "pending" });
+        return next;
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "申請に失敗しました");
+    }
+  }
+
+  // ── 申請取消 ───────────────────────────────────────────
+  async function handleCancelApply(date: string) {
+    try {
+      const updated = await cancelAttendance(date);
+      setRecordMap((prev) => {
+        const next = new Map(prev);
+        const existing = next.get(date);
+        next.set(date, { ...(existing ?? updated), approvalStatus: "cancelled" });
+        return next;
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "取消に失敗しました");
+    }
   }
 
   // ── 全日付リスト ───────────────────────────────────────
@@ -73,7 +104,7 @@ export default function AttendanceTable() {
   const { workedDays, totalMinutes } = allDays.reduce(
     (acc, d) => {
       const r = recordMap.get(d);
-      const w = calcWorkTime(r?.checkIn ?? null, r?.checkOut ?? null);
+      const w = calcWorkTime(r?.startTime ?? null, r?.finishTime ?? null);
       if (w) { acc.workedDays++; acc.totalMinutes += w.totalMinutes; }
       return acc;
     },
@@ -84,7 +115,7 @@ export default function AttendanceTable() {
 
   return (
     <>
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "2rem 1.5rem", fontFamily: '"Noto Sans JP", "Hiragino Sans", sans-serif' }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "2rem 1.5rem", fontFamily: '"Noto Sans JP", "Hiragino Sans", sans-serif' }}>
 
         {/* ── ヘッダー ── */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
@@ -98,16 +129,6 @@ export default function AttendanceTable() {
           </div>
         </div>
 
-        {/* ── サマリーカード ── */}
-        <div style={{ display: "flex", gap: 12, marginBottom: "1.25rem" }}>
-          <SummaryCard label="出勤日数" value={`${workedDays}`} unit="日" />
-          <SummaryCard
-            label="合計勤務時間"
-            value={`${totalH}`}
-            unit={`h ${String(totalM).padStart(2, "0")}m`}
-          />
-        </div>
-
         {/* ── エラー ── */}
         {error && (
           <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "1rem", background: "#fff5f5", border: "1px solid #fdd", borderRadius: 10, color: "#c0392b", fontSize: "0.875rem", marginBottom: "1rem" }}>
@@ -119,16 +140,16 @@ export default function AttendanceTable() {
         )}
 
         {/* ── テーブル ── */}
-        <div style={{ border: "1px solid #eee", borderRadius: 12, overflow: "hidden" }}>
+        <div style={{ border: "1px solid #16161629", borderRadius: 12, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
             <thead>
               <tr style={{ background: "#fafafa", borderBottom: "1px solid #eee" }}>
-                {["日付", "出勤", "退勤", "勤務時間", "コメント", ""].map((h, i) => (
+                {["日付", "出勤", "退勤", "勤務時間", "コメント", "申請承認", ""].map((h, i) => (
                   <th key={i} style={{
                     padding: "0.6rem 0.75rem", textAlign: "left",
                     fontSize: "0.72rem", fontWeight: 600, color: "#999",
                     letterSpacing: "0.04em", whiteSpace: "nowrap",
-                    width: i === 0 ? 88 : i === 1 || i === 2 ? 72 : i === 3 ? 84 : i === 5 ? 52 : undefined,
+                    width: i === 0 ? 88 : i === 1 || i === 2 ? 72 : i === 3 ? 84 : i === 5 ? 120 : i === 6 ? 52 : undefined,
                   }}>{h}</th>
                 ))}
               </tr>
@@ -137,7 +158,7 @@ export default function AttendanceTable() {
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <tr key={i} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                      <td colSpan={6} style={{ padding: "0.65rem 0.75rem" }}>
+                      <td colSpan={7} style={{ padding: "0.65rem 0.75rem" }}>
                         <div style={{
                           height: 18, borderRadius: 4,
                           background: "linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)",
@@ -153,7 +174,10 @@ export default function AttendanceTable() {
                     const isSun = dayOfWeekIndex === 0;
                     const isSat = dayOfWeekIndex === 6;
                     const isWeekend = isSun || isSat;
-                    const work = calcWorkTime(record?.checkIn ?? null, record?.checkOut ?? null);
+                    const work = calcWorkTime(
+                      formatTimeFromISO(record?.startTime ?? null),
+                      formatTimeFromISO(record?.finishTime ?? null)
+                    );
                     const isShort = work !== null && work.totalMinutes < 480;
 
                     const bg = isSun
@@ -164,8 +188,12 @@ export default function AttendanceTable() {
 
                     const displayRecord: AttendanceRecord = record ?? {
                       id: 0, userId: 0, date: dateStr,
-                      checkIn: null, checkOut: null, comment: "",
+                      startTime: null, finishTime: null, comment: "",
                     };
+
+                    const isEdited = record?.status === "edited";
+                    const approvalStatus = record?.approvalStatus ?? null;
+                    const isLocked = approvalStatus === "pending" || approvalStatus === "approved";
 
                     return (
                       <tr
@@ -186,17 +214,17 @@ export default function AttendanceTable() {
 
                         {/* 出勤 */}
                         <td style={{ padding: "0.7rem 0.75rem", whiteSpace: "nowrap" }}>
-                          {isWeekend && !record?.checkIn
+                          {isWeekend && !record?.startTime
                             ? <Dash />
-                            : <TimeVal>{record?.checkIn ?? <Dash />}</TimeVal>
+                            : <TimeVal>{formatTimeFromISO(record?.startTime ?? null) ?? <Dash />}</TimeVal>
                           }
                         </td>
 
                         {/* 退勤 */}
                         <td style={{ padding: "0.7rem 0.75rem", whiteSpace: "nowrap" }}>
-                          {isWeekend && !record?.checkOut
+                          {isWeekend && !record?.finishTime
                             ? <Dash />
-                            : <TimeVal>{record?.checkOut ?? <Dash />}</TimeVal>
+                            : <TimeVal>{formatTimeFromISO(record?.finishTime ?? null) ?? <Dash />}</TimeVal>
                           }
                         </td>
 
@@ -215,36 +243,89 @@ export default function AttendanceTable() {
                           <span style={{ fontSize: "0.8rem", color: "#777" }}>{record?.comment ?? ""}</span>
                         </td>
 
+                        {/* 申請承認 */}
+                        <td style={{ padding: "0.7rem 0.75rem", whiteSpace: "nowrap" }}>
+                          {isEdited && (
+                            <>
+                              {approvalStatus === "pending" && (
+                                <ApprovalBadge color="#d4800a" bg="#fff8ec">申請中</ApprovalBadge>
+                              )}
+                              {approvalStatus === "approved" && (
+                                <ApprovalBadge color="#1e7f4e" bg="#edfff4">承認</ApprovalBadge>
+                              )}
+                              {approvalStatus === "cancelled" && (
+                                <ApprovalBadge color="#888" bg="#f5f5f5">取消</ApprovalBadge>
+                              )}
+                              {(approvalStatus === null || approvalStatus === undefined) && (
+                                <div style={{ display: "flex", gap: 4 }}>
+                                  <button
+                                    onClick={() => handleApply(dateStr)}
+                                    style={{
+                                      fontSize: "0.72rem", fontWeight: 500,
+                                      color: "#fff", background: "#4f7ef8",
+                                      border: "none", borderRadius: 6,
+                                      padding: "0.2rem 0.55rem", cursor: "pointer",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >申請</button>
+                                  <button
+                                    onClick={() => handleCancelApply(dateStr)}
+                                    style={{
+                                      fontSize: "0.72rem", fontWeight: 500,
+                                      color: "#888", background: "none",
+                                      border: "1px solid #ddd", borderRadius: 6,
+                                      padding: "0.2rem 0.55rem", cursor: "pointer",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >取消</button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </td>
+
                         {/* 編集ボタン */}
                         <td style={{ padding: "0.7rem 0.75rem", textAlign: "center" }}>
-                          <button
-                            onClick={() => setEditTarget(displayRecord)}
-                            aria-label={`${day}日の勤務を編集`}
-                            style={{
-                              fontSize: "0.75rem", fontWeight: 500,
-                              color: "#4f7ef8", background: "none",
-                              border: "1px solid #d3e2fd", borderRadius: 6,
-                              padding: "0.25rem 0.6rem", cursor: "pointer",
-                              transition: "background 0.15s",
-                              whiteSpace: "nowrap",
-                            }}
-                            onMouseEnter={(e) => {
-                              (e.currentTarget as HTMLButtonElement).style.background = "#eef3ff";
-                              (e.currentTarget as HTMLButtonElement).style.borderColor = "#4f7ef8";
-                            }}
-                            onMouseLeave={(e) => {
-                              (e.currentTarget as HTMLButtonElement).style.background = "none";
-                              (e.currentTarget as HTMLButtonElement).style.borderColor = "#d3e2fd";
-                            }}
-                          >
-                            編集
-                          </button>
+                          {!isLocked && (
+                            <button
+                              onClick={() => setEditTarget(displayRecord)}
+                              aria-label={`${day}日の勤務を編集`}
+                              style={{
+                                fontSize: "0.75rem", fontWeight: 500,
+                                color: "#4f7ef8", background: "none",
+                                border: "1px solid #d3e2fd", borderRadius: 6,
+                                padding: "0.25rem 0.6rem", cursor: "pointer",
+                                transition: "background 0.15s",
+                                whiteSpace: "nowrap",
+                              }}
+                              onMouseEnter={(e) => {
+                                (e.currentTarget as HTMLButtonElement).style.background = "#eef3ff";
+                                (e.currentTarget as HTMLButtonElement).style.borderColor = "#4f7ef8";
+                              }}
+                              onMouseLeave={(e) => {
+                                (e.currentTarget as HTMLButtonElement).style.background = "none";
+                                (e.currentTarget as HTMLButtonElement).style.borderColor = "#d3e2fd";
+                              }}
+                            >
+                              編集
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );
                   })}
             </tbody>
           </table>
+        </div>
+
+        {/* ── サマリーカード ── */}
+        <div style={{ display: "flex", gap: 12, marginTop: "1.25rem" }}>
+          <SummaryCard label="出勤日数" value={`${workedDays}`} unit="日" />
+          <SummaryCard
+            label="合計勤務時間"
+            value={`${totalH}`}
+            unit={`h ${String(totalM).padStart(2, "0")}m`}
+          />
         </div>
 
         {/* shimmer アニメーション用 */}
@@ -297,4 +378,16 @@ function TimeVal({ children }: { children: React.ReactNode }) {
 
 function Dash() {
   return <span style={{ color: "#ccc", fontSize: "0.85rem" }}>—</span>;
+}
+
+function ApprovalBadge({ children, color, bg }: { children: React.ReactNode; color: string; bg: string }) {
+  return (
+    <span style={{
+      display: "inline-block",
+      fontSize: "0.72rem", fontWeight: 600,
+      color, background: bg,
+      borderRadius: 6, padding: "0.2rem 0.55rem",
+      whiteSpace: "nowrap",
+    }}>{children}</span>
+  );
 }
