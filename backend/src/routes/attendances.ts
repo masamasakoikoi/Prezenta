@@ -18,12 +18,14 @@ router.post("/start", async (req, res) => {
   if (!date) return res.status(400).json({ message: "date は必須です" });
 
   try {
+    const now = new Date();
+    const startTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
     const attendance = await prisma.attendance.create({
       data: {
         userId,
         date,
         status: "working",
-        startTime: new Date().toISOString(),
+        startTime,
       },
     });
     return res.json(attendance);
@@ -55,9 +57,11 @@ router.post("/finish", async (req, res) => {
       return res.status(400).json({ message: "退勤できません" });
     }
 
+    const now = new Date();
+    const finishTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
     const updated = await prisma.attendance.update({
       where: { id: attendance.id },
-      data: { status: "finished", finishTime: new Date().toISOString() },
+      data: { status: "finished", finishTime },
     });
     return res.json(updated);
   } catch {

@@ -25,12 +25,28 @@ export default function EditModal({ record, onClose, onSave }: Props) {
 
   useEffect(() => {
     if (record) {
-      const [sh, sm] = (record.startTime ?? "").split(":");
-      const [fh, fm] = (record.finishTime ?? "").split(":");
-      setStartH(sh ?? "");
-      setStartM(sm ?? "");
-      setFinishH(fh ?? "");
-      setFinishM(fm ?? "");
+      const parseHHMM = (timeStr: string | null): [string, string] => {
+        if (!timeStr) return ["", ""];
+        // ISO datetime 形式 ("2025-03-05T09:00:00.000Z" など) の場合はローカル時刻に変換
+        if (timeStr.includes("T")) {
+          const d = new Date(timeStr);
+          return [
+            String(d.getHours()).padStart(2, "0"),
+            String(d.getMinutes()).padStart(2, "0"),
+          ];
+        }
+        // "HH:MM" 形式
+        const [h, m] = timeStr.split(":");
+        return [h ?? "", m ?? ""];
+      };
+
+      const [sh, sm] = parseHHMM(record.startTime);
+      const [fh, fm] = parseHHMM(record.finishTime);
+      setStartH(sh);
+      setStartM(sm);
+      setFinishH(fh);
+      setFinishM(fm);
+      setComment(record.comment ?? "");
       setIsNextDay(false);
       setError(null);
       setTimeout(() => firstInputRef.current?.focus(), 50);
@@ -190,6 +206,25 @@ export default function EditModal({ record, onClose, onSave }: Props) {
               options={Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"))}
             />
           </div>
+        </div>
+
+        {/* コメント */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", marginTop: "1rem" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 500, color: "#666" }}>コメント</span>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={4}
+            placeholder="コメントを入力"
+            style={{
+              width: "100%", boxSizing: "border-box",
+              border: "1px solid #e0e0e0", borderRadius: 8,
+              padding: "0.45rem 0.6rem", fontSize: "0.875rem",
+              color: "#111", background: "#fff",
+              resize: "none", outline: "none",
+              fontFamily: "inherit", lineHeight: 1.5,
+            }}
+          />
         </div>
 
         {/* エラー */}

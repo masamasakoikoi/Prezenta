@@ -104,7 +104,10 @@ export default function AttendanceTable() {
   const { workedDays, totalMinutes } = allDays.reduce(
     (acc, d) => {
       const r = recordMap.get(d);
-      const w = calcWorkTime(r?.startTime ?? null, r?.finishTime ?? null);
+      const w = calcWorkTime(
+        formatTimeFromISO(r?.startTime ?? null),
+        formatTimeFromISO(r?.finishTime ?? null)
+      );
       if (w) { acc.workedDays++; acc.totalMinutes += w.totalMinutes; }
       return acc;
     },
@@ -115,11 +118,19 @@ export default function AttendanceTable() {
 
   return (
     <>
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "2rem 1.5rem", fontFamily: '"Noto Sans JP", "Hiragino Sans", sans-serif' }}>
+      <div style={{ width: "fit-content", margin: "0 auto", padding: "2rem 1.5rem", fontFamily: '"Noto Sans JP", "Hiragino Sans", sans-serif' }}>
 
         {/* ── ヘッダー ── */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
-          <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#111", margin: 0 }}>勤務一覧</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: "1.25rem", flexWrap: "wrap" }}>
+          <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#111", margin: 0, marginRight: "auto" }}>勤務一覧</h1>
+          <SummaryCard label="出勤日数" value={`${workedDays}`} unit="日" />
+          <SummaryCard
+            label="合計勤務時間"
+            value={`${totalH}`}
+            unit="h"
+            subValue={String(totalM).padStart(2, "0")}
+            subUnit="m"
+          />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <NavButton onClick={() => changeMonth(-1)}>‹</NavButton>
             <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#333", minWidth: 90, textAlign: "center" }}>
@@ -141,7 +152,7 @@ export default function AttendanceTable() {
 
         {/* ── テーブル ── */}
         <div style={{ border: "1px solid #16161629", borderRadius: 12, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+          <table style={{ width: "auto", borderCollapse: "collapse", fontSize: "0.875rem" }}>
             <thead>
               <tr style={{ background: "#fafafa", borderBottom: "1px solid #eee" }}>
                 {["日付", "出勤", "退勤", "勤務時間", "コメント", "申請承認", ""].map((h, i) => (
@@ -149,7 +160,7 @@ export default function AttendanceTable() {
                     padding: "0.6rem 0.75rem", textAlign: "left",
                     fontSize: "0.72rem", fontWeight: 600, color: "#999",
                     letterSpacing: "0.04em", whiteSpace: "nowrap",
-                    width: i === 0 ? 88 : i === 1 || i === 2 ? 72 : i === 3 ? 84 : i === 5 ? 120 : i === 6 ? 52 : undefined,
+                    width: i === 0 ? 88 : i === 1 || i === 2 ? 72 : i === 3 ? 84 : i === 4 ? 200 : i === 5 ? 120 : i === 6 ? 52 : undefined,
                   }}>{h}</th>
                 ))}
               </tr>
@@ -318,16 +329,6 @@ export default function AttendanceTable() {
           </table>
         </div>
 
-        {/* ── サマリーカード ── */}
-        <div style={{ display: "flex", gap: 12, marginTop: "1.25rem" }}>
-          <SummaryCard label="出勤日数" value={`${workedDays}`} unit="日" />
-          <SummaryCard
-            label="合計勤務時間"
-            value={`${totalH}`}
-            unit={`h ${String(totalM).padStart(2, "0")}m`}
-          />
-        </div>
-
         {/* shimmer アニメーション用 */}
         <style>{`
           @keyframes shimmer {
@@ -361,12 +362,19 @@ function NavButton({ onClick, children }: { onClick: () => void; children: React
   );
 }
 
-function SummaryCard({ label, value, unit }: { label: string; value: string; unit: string }) {
+function SummaryCard({ label, value, unit, subValue, subUnit }: {
+  label: string; value: string; unit: string;
+  subValue?: string; subUnit?: string;
+}) {
+  const unitStyle = { fontSize: "0.75rem", fontWeight: 500, color: "#888", marginLeft: 2 } as const;
   return (
-    <div style={{ flex: 1, background: "#f8f8f8", borderRadius: 10, padding: "0.875rem 1rem" }}>
-      <div style={{ fontSize: "0.72rem", fontWeight: 500, color: "#888", letterSpacing: "0.03em", marginBottom: 2 }}>{label}</div>
-      <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111", lineHeight: 1.1 }}>
-        {value}<span style={{ fontSize: "0.8rem", fontWeight: 500, color: "#888", marginLeft: 2 }}>{unit}</span>
+    <div style={{ background: "#f8f8f8", borderRadius: 10, padding: "0.5rem 0.875rem", minWidth: 110 }}>
+      <div style={{ fontSize: "0.68rem", fontWeight: 500, color: "#888", letterSpacing: "0.03em", marginBottom: 1 }}>{label}</div>
+      <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#111", lineHeight: 1.2 }}>
+        {value}<span style={unitStyle}>{unit}</span>
+        {subValue !== undefined && <>
+          {subValue}<span style={unitStyle}>{subUnit}</span>
+        </>}
       </div>
     </div>
   );
