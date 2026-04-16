@@ -5,6 +5,7 @@ export interface AttendanceRecord {
   startTime: string | null;   // "09:00"
   finishTime: string | null;  // "18:30"
   comment: string;
+  location: string | null;
   userId: number;
   status?: string;     // "working" | "finished" | "edited"
   approvalStatus?: string | null; // null | "pending" | "approved" | "cancelled"

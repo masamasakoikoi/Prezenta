@@ -10,6 +10,7 @@ export default function AttendanceTable() {
   const now = new Date();
   const [year, setYear]   = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
+  const [userName, setUserName] = useState<string>("");
 
   // date文字列 → AttendanceRecord のマップ
   const [recordMap, setRecordMap] = useState<Map<string, AttendanceRecord>>(new Map());
@@ -37,6 +38,14 @@ export default function AttendanceTable() {
   }, [year, month]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user") ?? "{}");
+      const full = [u.lastName, u.firstName].filter(Boolean).join(" ") || u.name || "";
+      setUserName(full);
+    } catch {}
+  }, []);
 
   // ── 月移動 ─────────────────────────────────────────────
   function changeMonth(delta: number) {
@@ -122,7 +131,9 @@ export default function AttendanceTable() {
 
         {/* ── ヘッダー ── */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: "1.25rem", flexWrap: "wrap" }}>
-          <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#111", margin: 0, marginRight: "auto" }}>勤務一覧</h1>
+          <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#111", margin: 0, marginRight: "auto" }}>
+            {userName && <span style={{ fontWeight: 400 }}>{userName}　</span>}の勤務一覧
+          </h1>
           <SummaryCard label="出勤日数" value={`${workedDays}`} unit="日" />
           <SummaryCard
             label="合計勤務時間"
@@ -155,12 +166,12 @@ export default function AttendanceTable() {
           <table style={{ width: "auto", borderCollapse: "collapse", fontSize: "0.875rem" }}>
             <thead>
               <tr style={{ background: "#fafafa", borderBottom: "1px solid #eee" }}>
-                {["日付", "出勤", "退勤", "勤務時間", "コメント", "申請承認", ""].map((h, i) => (
+                {["日付", "出勤", "退勤", "勤務時間", "位置情報", "コメント", "申請承認", ""].map((h, i) => (
                   <th key={i} style={{
                     padding: "0.6rem 0.75rem", textAlign: "left",
                     fontSize: "0.72rem", fontWeight: 600, color: "#999",
                     letterSpacing: "0.04em", whiteSpace: "nowrap",
-                    width: i === 0 ? 88 : i === 1 || i === 2 ? 72 : i === 3 ? 84 : i === 4 ? 200 : i === 5 ? 120 : i === 6 ? 52 : undefined,
+                    width: i === 0 ? 82 : i === 1 || i === 2 ? 62 : i === 3 ? 76 : i === 4 ? 90 : i === 5 ? 140 : i === 6 ? 110 : 48,
                   }}>{h}</th>
                 ))}
               </tr>
@@ -169,7 +180,7 @@ export default function AttendanceTable() {
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <tr key={i} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                      <td colSpan={7} style={{ padding: "0.65rem 0.75rem" }}>
+                      <td colSpan={8} style={{ padding: "0.65rem 0.75rem" }}>
                         <div style={{
                           height: 18, borderRadius: 4,
                           background: "linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)",
@@ -199,7 +210,7 @@ export default function AttendanceTable() {
 
                     const displayRecord: AttendanceRecord = record ?? {
                       id: 0, userId: 0, date: dateStr,
-                      startTime: null, finishTime: null, comment: "",
+                      startTime: null, finishTime: null, comment: "", location: null,
                     };
 
                     const isEdited = record?.status === "edited";
@@ -249,50 +260,39 @@ export default function AttendanceTable() {
                           }
                         </td>
 
+                        {/* 位置情報 */}
+                        <td style={{ padding: "0.7rem 0.75rem" }}>
+                          {record?.location
+                            ? <span style={{ fontSize: "0.8rem", color: "#555", wordBreak: "break-all" }}>📍 {record.location}</span>
+                            : <Dash />
+                          }
+                        </td>
+
                         {/* コメント */}
                         <td style={{ padding: "0.7rem 0.75rem" }}>
-                          <span style={{ fontSize: "0.8rem", color: "#777" }}>{record?.comment ?? ""}</span>
+                          {record?.comment
+                            ? <span style={{ fontSize: "0.8rem", color: "#777", wordBreak: "break-all" }}>{record.comment}</span>
+                            : <Dash />}
                         </td>
 
                         {/* 申請承認 */}
                         <td style={{ padding: "0.7rem 0.75rem", whiteSpace: "nowrap" }}>
-                          {isEdited && (
-                            <>
-                              {approvalStatus === "pending" && (
-                                <ApprovalBadge color="#d4800a" bg="#fff8ec">申請中</ApprovalBadge>
-                              )}
-                              {approvalStatus === "approved" && (
-                                <ApprovalBadge color="#1e7f4e" bg="#edfff4">承認</ApprovalBadge>
-                              )}
-                              {approvalStatus === "cancelled" && (
-                                <ApprovalBadge color="#888" bg="#f5f5f5">取消</ApprovalBadge>
-                              )}
-                              {(approvalStatus === null || approvalStatus === undefined) && (
-                                <div style={{ display: "flex", gap: 4 }}>
-                                  <button
-                                    onClick={() => handleApply(dateStr)}
-                                    style={{
-                                      fontSize: "0.72rem", fontWeight: 500,
-                                      color: "#fff", background: "#4f7ef8",
-                                      border: "none", borderRadius: 6,
-                                      padding: "0.2rem 0.55rem", cursor: "pointer",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                  >申請</button>
-                                  <button
-                                    onClick={() => handleCancelApply(dateStr)}
-                                    style={{
-                                      fontSize: "0.72rem", fontWeight: 500,
-                                      color: "#888", background: "none",
-                                      border: "1px solid #ddd", borderRadius: 6,
-                                      padding: "0.2rem 0.55rem", cursor: "pointer",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                  >取消</button>
-                                </div>
-                              )}
-                            </>
-                          )}
+                          {approvalStatus === "pending"   ? <ApprovalBadge color="#d4800a" bg="#fff8ec">申請中</ApprovalBadge>
+                          : approvalStatus === "approved" ? <ApprovalBadge color="#1e7f4e" bg="#edfff4">承認</ApprovalBadge>
+                          : approvalStatus === "rejected" ? <ApprovalBadge color="#c0392b" bg="#fff5f5">却下</ApprovalBadge>
+                          : approvalStatus === "cancelled"? <ApprovalBadge color="#888"    bg="#f5f5f5">取消</ApprovalBadge>
+                          : isEdited ? (
+                            <div style={{ display: "flex", gap: 4 }}>
+                              <button
+                                onClick={() => handleApply(dateStr)}
+                                style={{ fontSize: "0.72rem", fontWeight: 500, color: "#fff", background: "#4f7ef8", border: "none", borderRadius: 6, padding: "0.2rem 0.55rem", cursor: "pointer", whiteSpace: "nowrap" }}
+                              >申請</button>
+                              <button
+                                onClick={() => handleCancelApply(dateStr)}
+                                style={{ fontSize: "0.72rem", fontWeight: 500, color: "#888", background: "none", border: "1px solid #ddd", borderRadius: 6, padding: "0.2rem 0.55rem", cursor: "pointer", whiteSpace: "nowrap" }}
+                              >取消</button>
+                            </div>
+                          ) : <Dash />}
                         </td>
 
                         {/* 編集ボタン */}

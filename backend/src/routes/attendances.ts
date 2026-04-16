@@ -7,25 +7,29 @@ import { Prisma } from "../generated/prisma";
 
 const router = Router();
 
+const nowHHMM = () => {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+};
+
 router.use(authMiddleware);
 
 // 出勤
 router.post("/start", async (req, res) => {
   const userId = req.userId;
-  const { date } = req.body;
+  const { date, location: startLocation } = req.body;
 
   if (!userId) return res.status(401).json({ message: "認証が必要です" });
   if (!date) return res.status(400).json({ message: "date は必須です" });
 
   try {
-    const now = new Date();
-    const startTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
     const attendance = await prisma.attendance.create({
       data: {
         userId,
         date,
         status: "working",
-        startTime,
+        startTime: nowHHMM(),
+        location: startLocation ?? null,
       },
     });
     return res.json(attendance);
@@ -43,7 +47,7 @@ router.post("/start", async (req, res) => {
 // 退勤
 router.post("/finish", async (req, res) => {
   const userId = req.userId;
-  const { date } = req.body;
+  const { date, location: finishLocation } = req.body;
 
   if (!userId) return res.status(401).json({ message: "認証が必要です" });
   if (!date) return res.status(400).json({ message: "date は必須です" });
@@ -57,11 +61,9 @@ router.post("/finish", async (req, res) => {
       return res.status(400).json({ message: "退勤できません" });
     }
 
-    const now = new Date();
-    const finishTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
     const updated = await prisma.attendance.update({
       where: { id: attendance.id },
-      data: { status: "finished", finishTime },
+      data: { status: "finished", finishTime: nowHHMM(), ...(finishLocation != null ? { location: finishLocation } : {}) },
     });
     return res.json(updated);
   } catch {

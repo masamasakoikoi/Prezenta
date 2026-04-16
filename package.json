@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/app.ts"
+    "dev": "node --env-file=.env node_modules/.bin/tsx watch backend/src/app.ts"
   },
   "keywords": [],
   "author": "",

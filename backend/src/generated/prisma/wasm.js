@@ -123,7 +123,14 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   name: 'name',
-  password: 'password'
+  password: 'password',
+  branch: 'branch',
+  employmentType: 'employmentType',
+  role: 'role',
+  employeeNumber: 'employeeNumber',
+  lastName: 'lastName',
+  firstName: 'firstName',
+  nameKana: 'nameKana'
 };
 
 exports.Prisma.AttendanceScalarFieldEnum = {
@@ -136,6 +143,7 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   checkIn: 'checkIn',
   checkOut: 'checkOut',
   comment: 'comment',
+  location: 'location',
   approvalStatus: 'approvalStatus'
 };
 

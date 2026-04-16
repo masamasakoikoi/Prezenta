@@ -984,6 +984,13 @@ export namespace Prisma {
     email: string | null
     name: string | null
     password: string | null
+    branch: string | null
+    employmentType: string | null
+    role: string | null
+    employeeNumber: string | null
+    lastName: string | null
+    firstName: string | null
+    nameKana: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -991,6 +998,13 @@ export namespace Prisma {
     email: string | null
     name: string | null
     password: string | null
+    branch: string | null
+    employmentType: string | null
+    role: string | null
+    employeeNumber: string | null
+    lastName: string | null
+    firstName: string | null
+    nameKana: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -998,6 +1012,13 @@ export namespace Prisma {
     email: number
     name: number
     password: number
+    branch: number
+    employmentType: number
+    role: number
+    employeeNumber: number
+    lastName: number
+    firstName: number
+    nameKana: number
     _all: number
   }
 
@@ -1015,6 +1036,13 @@ export namespace Prisma {
     email?: true
     name?: true
     password?: true
+    branch?: true
+    employmentType?: true
+    role?: true
+    employeeNumber?: true
+    lastName?: true
+    firstName?: true
+    nameKana?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1022,6 +1050,13 @@ export namespace Prisma {
     email?: true
     name?: true
     password?: true
+    branch?: true
+    employmentType?: true
+    role?: true
+    employeeNumber?: true
+    lastName?: true
+    firstName?: true
+    nameKana?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1029,6 +1064,13 @@ export namespace Prisma {
     email?: true
     name?: true
     password?: true
+    branch?: true
+    employmentType?: true
+    role?: true
+    employeeNumber?: true
+    lastName?: true
+    firstName?: true
+    nameKana?: true
     _all?: true
   }
 
@@ -1123,6 +1165,13 @@ export namespace Prisma {
     email: string
     name: string | null
     password: string
+    branch: string | null
+    employmentType: string | null
+    role: string
+    employeeNumber: string | null
+    lastName: string | null
+    firstName: string | null
+    nameKana: string | null
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -1149,6 +1198,13 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     password?: boolean
+    branch?: boolean
+    employmentType?: boolean
+    role?: boolean
+    employeeNumber?: boolean
+    lastName?: boolean
+    firstName?: boolean
+    nameKana?: boolean
     attendances?: boolean | User$attendancesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -1158,6 +1214,13 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     password?: boolean
+    branch?: boolean
+    employmentType?: boolean
+    role?: boolean
+    employeeNumber?: boolean
+    lastName?: boolean
+    firstName?: boolean
+    nameKana?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1165,6 +1228,13 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     password?: boolean
+    branch?: boolean
+    employmentType?: boolean
+    role?: boolean
+    employeeNumber?: boolean
+    lastName?: boolean
+    firstName?: boolean
+    nameKana?: boolean
   }
 
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1183,6 +1253,13 @@ export namespace Prisma {
       email: string
       name: string | null
       password: string
+      branch: string | null
+      employmentType: string | null
+      role: string
+      employeeNumber: string | null
+      lastName: string | null
+      firstName: string | null
+      nameKana: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1581,6 +1658,13 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
+    readonly branch: FieldRef<"User", 'String'>
+    readonly employmentType: FieldRef<"User", 'String'>
+    readonly role: FieldRef<"User", 'String'>
+    readonly employeeNumber: FieldRef<"User", 'String'>
+    readonly lastName: FieldRef<"User", 'String'>
+    readonly firstName: FieldRef<"User", 'String'>
+    readonly nameKana: FieldRef<"User", 'String'>
   }
     
 
@@ -1959,6 +2043,7 @@ export namespace Prisma {
     checkIn: string | null
     checkOut: string | null
     comment: string | null
+    location: string | null
     approvalStatus: string | null
   }
 
@@ -1972,6 +2057,7 @@ export namespace Prisma {
     checkIn: string | null
     checkOut: string | null
     comment: string | null
+    location: string | null
     approvalStatus: string | null
   }
 
@@ -1985,6 +2071,7 @@ export namespace Prisma {
     checkIn: number
     checkOut: number
     comment: number
+    location: number
     approvalStatus: number
     _all: number
   }
@@ -2010,6 +2097,7 @@ export namespace Prisma {
     checkIn?: true
     checkOut?: true
     comment?: true
+    location?: true
     approvalStatus?: true
   }
 
@@ -2023,6 +2111,7 @@ export namespace Prisma {
     checkIn?: true
     checkOut?: true
     comment?: true
+    location?: true
     approvalStatus?: true
   }
 
@@ -2036,6 +2125,7 @@ export namespace Prisma {
     checkIn?: true
     checkOut?: true
     comment?: true
+    location?: true
     approvalStatus?: true
     _all?: true
   }
@@ -2136,6 +2226,7 @@ export namespace Prisma {
     checkIn: string | null
     checkOut: string | null
     comment: string
+    location: string | null
     approvalStatus: string | null
     _count: AttendanceCountAggregateOutputType | null
     _avg: AttendanceAvgAggregateOutputType | null
@@ -2168,6 +2259,7 @@ export namespace Prisma {
     checkIn?: boolean
     checkOut?: boolean
     comment?: boolean
+    location?: boolean
     approvalStatus?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
@@ -2182,6 +2274,7 @@ export namespace Prisma {
     checkIn?: boolean
     checkOut?: boolean
     comment?: boolean
+    location?: boolean
     approvalStatus?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
@@ -2196,6 +2289,7 @@ export namespace Prisma {
     checkIn?: boolean
     checkOut?: boolean
     comment?: boolean
+    location?: boolean
     approvalStatus?: boolean
   }
 
@@ -2221,6 +2315,7 @@ export namespace Prisma {
       checkIn: string | null
       checkOut: string | null
       comment: string
+      location: string | null
       approvalStatus: string | null
     }, ExtArgs["result"]["attendance"]>
     composites: {}
@@ -2625,6 +2720,7 @@ export namespace Prisma {
     readonly checkIn: FieldRef<"Attendance", 'String'>
     readonly checkOut: FieldRef<"Attendance", 'String'>
     readonly comment: FieldRef<"Attendance", 'String'>
+    readonly location: FieldRef<"Attendance", 'String'>
     readonly approvalStatus: FieldRef<"Attendance", 'String'>
   }
     
@@ -2971,7 +3067,14 @@ export namespace Prisma {
     id: 'id',
     email: 'email',
     name: 'name',
-    password: 'password'
+    password: 'password',
+    branch: 'branch',
+    employmentType: 'employmentType',
+    role: 'role',
+    employeeNumber: 'employeeNumber',
+    lastName: 'lastName',
+    firstName: 'firstName',
+    nameKana: 'nameKana'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -2987,6 +3090,7 @@ export namespace Prisma {
     checkIn: 'checkIn',
     checkOut: 'checkOut',
     comment: 'comment',
+    location: 'location',
     approvalStatus: 'approvalStatus'
   };
 
@@ -3046,6 +3150,13 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     password?: StringFilter<"User"> | string
+    branch?: StringNullableFilter<"User"> | string | null
+    employmentType?: StringNullableFilter<"User"> | string | null
+    role?: StringFilter<"User"> | string
+    employeeNumber?: StringNullableFilter<"User"> | string | null
+    lastName?: StringNullableFilter<"User"> | string | null
+    firstName?: StringNullableFilter<"User"> | string | null
+    nameKana?: StringNullableFilter<"User"> | string | null
     attendances?: AttendanceListRelationFilter
   }
 
@@ -3054,6 +3165,13 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrderInput | SortOrder
     password?: SortOrder
+    branch?: SortOrderInput | SortOrder
+    employmentType?: SortOrderInput | SortOrder
+    role?: SortOrder
+    employeeNumber?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
+    firstName?: SortOrderInput | SortOrder
+    nameKana?: SortOrderInput | SortOrder
     attendances?: AttendanceOrderByRelationAggregateInput
   }
 
@@ -3065,6 +3183,13 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringNullableFilter<"User"> | string | null
     password?: StringFilter<"User"> | string
+    branch?: StringNullableFilter<"User"> | string | null
+    employmentType?: StringNullableFilter<"User"> | string | null
+    role?: StringFilter<"User"> | string
+    employeeNumber?: StringNullableFilter<"User"> | string | null
+    lastName?: StringNullableFilter<"User"> | string | null
+    firstName?: StringNullableFilter<"User"> | string | null
+    nameKana?: StringNullableFilter<"User"> | string | null
     attendances?: AttendanceListRelationFilter
   }, "id" | "email">
 
@@ -3073,6 +3198,13 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrderInput | SortOrder
     password?: SortOrder
+    branch?: SortOrderInput | SortOrder
+    employmentType?: SortOrderInput | SortOrder
+    role?: SortOrder
+    employeeNumber?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
+    firstName?: SortOrderInput | SortOrder
+    nameKana?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -3088,6 +3220,13 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     password?: StringWithAggregatesFilter<"User"> | string
+    branch?: StringNullableWithAggregatesFilter<"User"> | string | null
+    employmentType?: StringNullableWithAggregatesFilter<"User"> | string | null
+    role?: StringWithAggregatesFilter<"User"> | string
+    employeeNumber?: StringNullableWithAggregatesFilter<"User"> | string | null
+    lastName?: StringNullableWithAggregatesFilter<"User"> | string | null
+    firstName?: StringNullableWithAggregatesFilter<"User"> | string | null
+    nameKana?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type AttendanceWhereInput = {
@@ -3103,6 +3242,7 @@ export namespace Prisma {
     checkIn?: StringNullableFilter<"Attendance"> | string | null
     checkOut?: StringNullableFilter<"Attendance"> | string | null
     comment?: StringFilter<"Attendance"> | string
+    location?: StringNullableFilter<"Attendance"> | string | null
     approvalStatus?: StringNullableFilter<"Attendance"> | string | null
     user?: XOR<UserRelationFilter, UserWhereInput>
   }
@@ -3117,6 +3257,7 @@ export namespace Prisma {
     checkIn?: SortOrderInput | SortOrder
     checkOut?: SortOrderInput | SortOrder
     comment?: SortOrder
+    location?: SortOrderInput | SortOrder
     approvalStatus?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
   }
@@ -3135,6 +3276,7 @@ export namespace Prisma {
     checkIn?: StringNullableFilter<"Attendance"> | string | null
     checkOut?: StringNullableFilter<"Attendance"> | string | null
     comment?: StringFilter<"Attendance"> | string
+    location?: StringNullableFilter<"Attendance"> | string | null
     approvalStatus?: StringNullableFilter<"Attendance"> | string | null
     user?: XOR<UserRelationFilter, UserWhereInput>
   }, "id" | "userId_date">
@@ -3149,6 +3291,7 @@ export namespace Prisma {
     checkIn?: SortOrderInput | SortOrder
     checkOut?: SortOrderInput | SortOrder
     comment?: SortOrder
+    location?: SortOrderInput | SortOrder
     approvalStatus?: SortOrderInput | SortOrder
     _count?: AttendanceCountOrderByAggregateInput
     _avg?: AttendanceAvgOrderByAggregateInput
@@ -3170,6 +3313,7 @@ export namespace Prisma {
     checkIn?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
     checkOut?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
     comment?: StringWithAggregatesFilter<"Attendance"> | string
+    location?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
     approvalStatus?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
   }
 
@@ -3177,6 +3321,13 @@ export namespace Prisma {
     email: string
     name?: string | null
     password: string
+    branch?: string | null
+    employmentType?: string | null
+    role?: string
+    employeeNumber?: string | null
+    lastName?: string | null
+    firstName?: string | null
+    nameKana?: string | null
     attendances?: AttendanceCreateNestedManyWithoutUserInput
   }
 
@@ -3185,6 +3336,13 @@ export namespace Prisma {
     email: string
     name?: string | null
     password: string
+    branch?: string | null
+    employmentType?: string | null
+    role?: string
+    employeeNumber?: string | null
+    lastName?: string | null
+    firstName?: string | null
+    nameKana?: string | null
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -3192,6 +3350,13 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
+    branch?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentType?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    nameKana?: NullableStringFieldUpdateOperationsInput | string | null
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
   }
 
@@ -3200,6 +3365,13 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
+    branch?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentType?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    nameKana?: NullableStringFieldUpdateOperationsInput | string | null
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -3208,12 +3380,26 @@ export namespace Prisma {
     email: string
     name?: string | null
     password: string
+    branch?: string | null
+    employmentType?: string | null
+    role?: string
+    employeeNumber?: string | null
+    lastName?: string | null
+    firstName?: string | null
+    nameKana?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
+    branch?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentType?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    nameKana?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -3221,6 +3407,13 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
+    branch?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentType?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    nameKana?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AttendanceCreateInput = {
@@ -3231,6 +3424,7 @@ export namespace Prisma {
     checkIn?: string | null
     checkOut?: string | null
     comment?: string
+    location?: string | null
     approvalStatus?: string | null
     user: UserCreateNestedOneWithoutAttendancesInput
   }
@@ -3245,6 +3439,7 @@ export namespace Prisma {
     checkIn?: string | null
     checkOut?: string | null
     comment?: string
+    location?: string | null
     approvalStatus?: string | null
   }
 
@@ -3256,6 +3451,7 @@ export namespace Prisma {
     checkIn?: NullableStringFieldUpdateOperationsInput | string | null
     checkOut?: NullableStringFieldUpdateOperationsInput | string | null
     comment?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     approvalStatus?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutAttendancesNestedInput
   }
@@ -3270,6 +3466,7 @@ export namespace Prisma {
     checkIn?: NullableStringFieldUpdateOperationsInput | string | null
     checkOut?: NullableStringFieldUpdateOperationsInput | string | null
     comment?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     approvalStatus?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -3283,6 +3480,7 @@ export namespace Prisma {
     checkIn?: string | null
     checkOut?: string | null
     comment?: string
+    location?: string | null
     approvalStatus?: string | null
   }
 
@@ -3294,6 +3492,7 @@ export namespace Prisma {
     checkIn?: NullableStringFieldUpdateOperationsInput | string | null
     checkOut?: NullableStringFieldUpdateOperationsInput | string | null
     comment?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     approvalStatus?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -3307,6 +3506,7 @@ export namespace Prisma {
     checkIn?: NullableStringFieldUpdateOperationsInput | string | null
     checkOut?: NullableStringFieldUpdateOperationsInput | string | null
     comment?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     approvalStatus?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -3369,6 +3569,13 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     password?: SortOrder
+    branch?: SortOrder
+    employmentType?: SortOrder
+    role?: SortOrder
+    employeeNumber?: SortOrder
+    lastName?: SortOrder
+    firstName?: SortOrder
+    nameKana?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -3380,6 +3587,13 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     password?: SortOrder
+    branch?: SortOrder
+    employmentType?: SortOrder
+    role?: SortOrder
+    employeeNumber?: SortOrder
+    lastName?: SortOrder
+    firstName?: SortOrder
+    nameKana?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -3387,6 +3601,13 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     password?: SortOrder
+    branch?: SortOrder
+    employmentType?: SortOrder
+    role?: SortOrder
+    employeeNumber?: SortOrder
+    lastName?: SortOrder
+    firstName?: SortOrder
+    nameKana?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -3463,6 +3684,7 @@ export namespace Prisma {
     checkIn?: SortOrder
     checkOut?: SortOrder
     comment?: SortOrder
+    location?: SortOrder
     approvalStatus?: SortOrder
   }
 
@@ -3481,6 +3703,7 @@ export namespace Prisma {
     checkIn?: SortOrder
     checkOut?: SortOrder
     comment?: SortOrder
+    location?: SortOrder
     approvalStatus?: SortOrder
   }
 
@@ -3494,6 +3717,7 @@ export namespace Prisma {
     checkIn?: SortOrder
     checkOut?: SortOrder
     comment?: SortOrder
+    location?: SortOrder
     approvalStatus?: SortOrder
   }
 
@@ -3693,6 +3917,7 @@ export namespace Prisma {
     checkIn?: string | null
     checkOut?: string | null
     comment?: string
+    location?: string | null
     approvalStatus?: string | null
   }
 
@@ -3705,6 +3930,7 @@ export namespace Prisma {
     checkIn?: string | null
     checkOut?: string | null
     comment?: string
+    location?: string | null
     approvalStatus?: string | null
   }
 
@@ -3746,6 +3972,7 @@ export namespace Prisma {
     checkIn?: StringNullableFilter<"Attendance"> | string | null
     checkOut?: StringNullableFilter<"Attendance"> | string | null
     comment?: StringFilter<"Attendance"> | string
+    location?: StringNullableFilter<"Attendance"> | string | null
     approvalStatus?: StringNullableFilter<"Attendance"> | string | null
   }
 
@@ -3753,6 +3980,13 @@ export namespace Prisma {
     email: string
     name?: string | null
     password: string
+    branch?: string | null
+    employmentType?: string | null
+    role?: string
+    employeeNumber?: string | null
+    lastName?: string | null
+    firstName?: string | null
+    nameKana?: string | null
   }
 
   export type UserUncheckedCreateWithoutAttendancesInput = {
@@ -3760,6 +3994,13 @@ export namespace Prisma {
     email: string
     name?: string | null
     password: string
+    branch?: string | null
+    employmentType?: string | null
+    role?: string
+    employeeNumber?: string | null
+    lastName?: string | null
+    firstName?: string | null
+    nameKana?: string | null
   }
 
   export type UserCreateOrConnectWithoutAttendancesInput = {
@@ -3782,6 +4023,13 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
+    branch?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentType?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    nameKana?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateWithoutAttendancesInput = {
@@ -3789,6 +4037,13 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
+    branch?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentType?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    nameKana?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AttendanceCreateManyUserInput = {
@@ -3800,6 +4055,7 @@ export namespace Prisma {
     checkIn?: string | null
     checkOut?: string | null
     comment?: string
+    location?: string | null
     approvalStatus?: string | null
   }
 
@@ -3811,6 +4067,7 @@ export namespace Prisma {
     checkIn?: NullableStringFieldUpdateOperationsInput | string | null
     checkOut?: NullableStringFieldUpdateOperationsInput | string | null
     comment?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     approvalStatus?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -3823,6 +4080,7 @@ export namespace Prisma {
     checkIn?: NullableStringFieldUpdateOperationsInput | string | null
     checkOut?: NullableStringFieldUpdateOperationsInput | string | null
     comment?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     approvalStatus?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -3835,6 +4093,7 @@ export namespace Prisma {
     checkIn?: NullableStringFieldUpdateOperationsInput | string | null
     checkOut?: NullableStringFieldUpdateOperationsInput | string | null
     comment?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     approvalStatus?: NullableStringFieldUpdateOperationsInput | string | null
   }
 

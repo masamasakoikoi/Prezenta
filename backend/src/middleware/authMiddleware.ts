@@ -31,7 +31,8 @@ export const authMiddleware = (
       return res.status(401).json({ message: "トークンが不正です(userIdが不正)"});
     }
 
-    req.userId = userId;
+    req.userId   = userId;
+    req.userRole = (decoded as any).role ?? "user";
     next();
   } catch {
     return res.status(401).json({ error: "トークンが無効または期限切れです" });

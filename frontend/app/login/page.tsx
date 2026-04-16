@@ -31,7 +31,7 @@ export default function LoginPage() {
       const { token, user } = await res.json();
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      router.push("/attendance");
+      router.push(user.role === "admin" ? "/admin" : "/attendance");
     } catch (e) {
       setError(e instanceof Error ? e.message : "ログインに失敗しました");
     } finally {

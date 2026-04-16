@@ -1,7 +1,8 @@
 import express from "express";
 import attendanceRouter from "./routes/attendances";
-import usersRouter from "./routes/users"
-import authRouter from "./routes/auth"
+import usersRouter from "./routes/users";
+import authRouter from "./routes/auth";
+import adminRouter from "./routes/admin";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -30,6 +31,7 @@ app.get("/", (req, res) => {
 app.use("/attendances", attendanceRouter);
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
+app.use("/admin", adminRouter);
 
 app.listen(4000, () => {
   console.log("Server started on http://localhost:4000");

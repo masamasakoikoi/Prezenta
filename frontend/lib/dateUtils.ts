@@ -1,4 +1,4 @@
-const JP_DAYS = ["日", "月", "火", "水", "木", "金", "土"] as const;
+export const JP_DAYS = ["日", "月", "火", "水", "木", "金", "土"] as const;
 
 export function parseDate(dateStr: string) {
   // "2025-03-05T00:00:00" のようなISO文字列にも対応

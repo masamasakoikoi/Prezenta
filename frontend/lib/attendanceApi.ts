@@ -32,7 +32,6 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   }
 
   const data = await res.json();
-  console.log("API response:", data); // ← 追加
   return data as T;
 }
 
@@ -60,21 +59,15 @@ export async function fetchToday(): Promise<AttendanceRecord | null> {
   return apiFetch<AttendanceRecord | null>("/attendances/today");
 }
 
-// 出勤
-export async function checkIn(): Promise<AttendanceRecord> {
-  return apiFetch<AttendanceRecord>("/attendances/start", {
+function clockAction(endpoint: string, location?: string): Promise<AttendanceRecord> {
+  return apiFetch<AttendanceRecord>(endpoint, {
     method: "POST",
-    body: JSON.stringify({ date: getTodayString() }),
+    body: JSON.stringify({ date: getTodayString(), location: location ?? null }),
   });
 }
 
-// 退勤
-export async function checkOut(): Promise<AttendanceRecord> {
-  return apiFetch<AttendanceRecord>("/attendances/finish", {
-    method: "POST",
-    body: JSON.stringify({ date: getTodayString() }),
-  });
-}
+export const checkIn  = (location?: string) => clockAction("/attendances/start",  location);
+export const checkOut = (location?: string) => clockAction("/attendances/finish", location);
 
 // 申請
 export async function applyAttendance(date: string): Promise<AttendanceRecord> {

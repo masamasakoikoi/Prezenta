@@ -1,0 +1,46 @@
+"use client";
+
+import { use, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import EmployeeEditForm from "@/components/EmployeeEditForm";
+
+export default function AdminEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") ?? "{}");
+      if (user.role !== "admin") router.replace("/attendance");
+    } catch {
+      router.replace("/login");
+    }
+  }, [router]);
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: '"Noto Sans JP", "Hiragino Sans", sans-serif' }}>
+      <nav style={{
+        background: "#fff", borderBottom: "2px solid #e8e8e8",
+        display: "flex", alignItems: "center",
+        padding: "0 1rem", height: 52,
+      }}>
+        <span style={{ fontSize: "1rem", fontWeight: 700, color: "#111" }}>管理者ページ</span>
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "/login";
+          }}
+          style={{
+            marginLeft: "auto", fontSize: "0.8rem", fontWeight: 500,
+            color: "#fff", background: "#4f7ef8",
+            border: "none", borderRadius: 8,
+            padding: "0.35rem 0.85rem", cursor: "pointer",
+          }}
+        >ログアウト</button>
+      </nav>
+
+      <EmployeeEditForm id={Number(id)} />
+    </div>
+  );
+}
