@@ -171,7 +171,7 @@ export default function AttendanceTable() {
                     padding: "0.6rem 0.75rem", textAlign: "left",
                     fontSize: "0.72rem", fontWeight: 600, color: "#999",
                     letterSpacing: "0.04em", whiteSpace: "nowrap",
-                    width: i === 0 ? 82 : i === 1 || i === 2 ? 62 : i === 3 ? 76 : i === 4 ? 90 : i === 5 ? 140 : i === 6 ? 110 : 48,
+                    width: i === 0 ? 82 : i === 1 || i === 2 ? 62 : i === 3 ? 76 : i === 4 ? 140 : i === 5 ? 140 : i === 6 ? 110 : 48,
                   }}>{h}</th>
                 ))}
               </tr>
@@ -263,7 +263,7 @@ export default function AttendanceTable() {
                         {/* 位置情報 */}
                         <td style={{ padding: "0.7rem 0.75rem" }}>
                           {record?.location
-                            ? <span style={{ fontSize: "0.8rem", color: "#555", wordBreak: "break-all" }}>📍 {record.location}</span>
+                            ? <span style={{ fontSize: "0.8rem", color: "#555", wordBreak: "break-all" }}>{record.location}</span>
                             : <Dash />
                           }
                         </td>

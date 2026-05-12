@@ -207,7 +207,7 @@ export default function AdminAttendanceTable({ userId, employeeName }: Props) {
 
                       {/* 位置情報 */}
                       <td style={{ padding: "0.7rem 0.75rem", whiteSpace: "nowrap" }}>
-                        {record?.location ? <span style={{ fontSize: "0.8rem", color: "#555" }}>📍 {record.location}</span> : <Dash />}
+                        {record?.location ? <span style={{ fontSize: "0.8rem", color: "#555" }}>{record.location}</span> : <Dash />}
                       </td>
 
                       {/* コメント */}

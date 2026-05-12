@@ -28,6 +28,7 @@ model User {
   nameKana       String?
 
   attendances Attendance[]
+  reports Report[]
 }
 
 model Attendance {
@@ -46,4 +47,15 @@ model Attendance {
   approvalStatus String?   // null | "pending" | "approved" | "cancelled"
 
   @@unique([userId, date])
+}
+
+model Report {
+  id        Int @id @default(autoincrement())
+  userId    Int
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  date      String
+  reason    String?
+  status    String @default("pending")
+  createdAt DateTime @default(now())
 }

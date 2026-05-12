@@ -11,8 +11,10 @@ async function reverseGeocode(lat: number, lon: number): Promise<string> {
   const data = await res.json();
   const addr = data.address ?? {};
   return [
-    addr.state,
+    // addr.state,
+    addr.province,
     addr.city ?? addr.town ?? addr.village ?? addr.county,
+    // console.log(addr.province)
   ].filter(Boolean).join("");
 }
 
@@ -78,7 +80,8 @@ export default function ClockSection() {
   function handleCheckOut() {
     if (!todayRecord?.startTime) { setError("出勤打刻がされていません"); return; }
     if (todayRecord?.finishTime) { setError("本日の退勤は打刻済みです"); return; }
-    setLocationModal({ action: "out" });
+    // setLocationModal({ action: "out" });
+    executeClock("out");
   }
 
   const checkedIn  = !!todayRecord?.startTime;

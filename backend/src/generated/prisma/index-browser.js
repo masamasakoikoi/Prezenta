@@ -147,6 +147,16 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   approvalStatus: 'approvalStatus'
 };
 
+exports.Prisma.ReportScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  date: 'date',
+  reason: 'reason',
+  status: 'status',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -160,7 +170,8 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Attendance: 'Attendance'
+  Attendance: 'Attendance',
+  Report: 'Report'
 };
 
 /**
