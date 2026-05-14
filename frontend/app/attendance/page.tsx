@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ClockSection from "@/components/ClockSection";
 import AttendanceTable from "@/components/AttendanceTable";
+import Reports from "@/components/reports";
 
 type Tab = "clock" | "attendance" | "report";
 
@@ -118,9 +119,14 @@ export default function AttendancePage() {
       {activeTab === "clock"      && <ClockSection />}
       {activeTab === "attendance" && <AttendanceTable />}
       {activeTab === "report"     && (
-        <div style={{ textAlign: "center", padding: "4rem 1rem", color: "#aaa", fontSize: "0.95rem" }}>
-          届出機能は準備中です
-        </div>
+        <button
+            style={{
+              fontSize: "0.8rem", fontWeight: 500,
+              color: "#fff", background: "#4f7ef8",
+              border: "none", borderRadius: 8,
+              padding: "0.35rem 0.85rem", cursor: "pointer",
+            }}
+          ><Reports /></button>
       )}
     </div>
   );
