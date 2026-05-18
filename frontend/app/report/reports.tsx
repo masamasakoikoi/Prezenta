@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ReportForm } from "@/components/ReportForm";
 
 export default function reports() {
   const[modalOpen, setModalOpen] = useState(false);

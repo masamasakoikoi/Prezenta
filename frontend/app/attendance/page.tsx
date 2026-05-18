@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ClockSection from "@/components/ClockSection";
 import AttendanceTable from "@/components/AttendanceTable";
-import Reports from "@/components/reports";
+import Reports from "@/app/report/reports";
 
 type Tab = "clock" | "attendance" | "report";
 
