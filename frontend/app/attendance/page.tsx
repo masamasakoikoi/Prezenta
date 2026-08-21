@@ -118,16 +118,7 @@ export default function AttendancePage() {
       {/* ── コンテンツ ── */}
       {activeTab === "clock"      && <ClockSection />}
       {activeTab === "attendance" && <AttendanceTable />}
-      {activeTab === "report"     && (
-        <button
-            style={{
-              fontSize: "0.8rem", fontWeight: 500,
-              color: "#fff", background: "#4f7ef8",
-              border: "none", borderRadius: 8,
-              padding: "0.35rem 0.85rem", cursor: "pointer",
-            }}
-          ><Reports /></button>
-      )}
+      {activeTab === "report"     && <Reports />}
     </div>
   );
 }
